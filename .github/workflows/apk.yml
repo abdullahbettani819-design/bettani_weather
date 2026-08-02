@@ -12,7 +12,12 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
         with:
-          persist-credentials: false
+          submodules: false
+
+      - name: Clean Git Submodules
+        run: |
+          rm -rf .gitmodules
+          git rm --cached flutter || true
 
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
