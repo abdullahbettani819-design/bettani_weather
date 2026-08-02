@@ -9,26 +9,26 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Code
+      - name: Checkout Repository
         uses: actions/checkout@v4
-        with:
-          submodules: false
 
-      - name: Clean Git Submodules
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+
+      - name: Install Flutter Manually
         run: |
-          rm -rf .gitmodules
-          git rm --cached flutter || true
+          git clone https://github.com/flutter/flutter.git -b stable --depth 1 _flutter
+          echo "$GITHUB_WORKSPACE/_flutter/bin" >> $GITHUB_PATH
 
-      - name: Set up Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          flutter-version: '3.19.x'
-          channel: 'stable'
+      - name: Doctor & Dependencies
+        run: |
+          flutter doctor
+          flutter pub get
 
-      - name: Install Dependencies
-        run: flutter pub get
-
-      - name: Build APK
+      - name: Build Release APK
         run: flutter build apk --release
 
       - name: Upload APK Artifact
